@@ -60,7 +60,7 @@ const ChartComponent = () => {
       Object.entries(item).forEach(([key, value]) => {
         if (key !== 'date') {
           const jobName = key;
-          const jobValue = parseInt(value.S);
+          const jobValue = parseInt(value.N);
           if (!formattedData[date]) {
             formattedData[date] = {};
           }

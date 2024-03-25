@@ -50,7 +50,7 @@ const YearlyChart = () => {
         Object.entries(item).forEach(([key, value]) => {
           if (key !== 'year') {
             const jobName = key;
-            const jobValue = parseInt(value.S);
+            const jobValue = parseInt(value.N);
             if (!formattedData[year]) {
               formattedData[year] = {};
             }

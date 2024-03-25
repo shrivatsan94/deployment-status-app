@@ -6,6 +6,7 @@ import LeftPane from './LeftPane';
 import WeeklyChart from './WeeklyChart'
 import MonthlyChart from './MonthlyChart'
 import YearlyChart from './YearlyChart'
+import JobList from './JobList'
 
 const MainComponent = () => {
   const [selectedOption, setSelectedOption] = useState('datewise');
@@ -15,6 +16,8 @@ const MainComponent = () => {
   };
 
   return (
+    <div>
+    <h3 style={{ textAlign: 'center' }}>Deployment status details</h3>
     <div className="main-container">
       <LeftPane onSelectOption={handleSelectOption} />
       <div className="main-content">
@@ -22,7 +25,9 @@ const MainComponent = () => {
         {selectedOption === 'weekly' && <WeeklyChart/>}
         {selectedOption === 'monthly' && <MonthlyChart/>}
         {selectedOption === 'yearly' && <YearlyChart/>}
+        {selectedOption === 'joblist' && <JobList/>}
       </div>
+    </div>
     </div>
   );
 };

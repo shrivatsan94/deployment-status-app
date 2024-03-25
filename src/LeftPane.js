@@ -10,6 +10,7 @@ const LeftPane = ({ onSelectOption }) => {
         <li onClick={() => onSelectOption('weekly')}>Weekly</li>
         <li onClick={() => onSelectOption('monthly')}>Monthly</li>
         <li onClick={() => onSelectOption('yearly')}>Yearly</li>
+        <li onClick={() => onSelectOption('joblist')}>JobList</li>
       </ul>
     </div>
   );

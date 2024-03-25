@@ -57,7 +57,7 @@ const MonthlyChart = () => {
       Object.entries(item).forEach(([key, value]) => {
         if (key !== 'month') {
           const jobName = key;
-          const jobValue = parseInt(value.S);
+          const jobValue = parseInt(value.N);
           if (!formattedData[month]) {
             formattedData[month] = {};
           }

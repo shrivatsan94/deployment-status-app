@@ -57,7 +57,7 @@ const WeeklyChart = () => {
       Object.entries(item).forEach(([key, value]) => {
         if (key !== 'week') {
           const jobName = key;
-          const jobValue = parseInt(value.S);
+          const jobValue = parseInt(value.N);
           if (!formattedData[week]) {
             formattedData[week] = {};
           }

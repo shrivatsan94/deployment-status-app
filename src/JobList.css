@@ -1,0 +1,79 @@
+.toggle {
+  width: 120px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 15px;
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+
+.slider {
+  width: 50%;
+  height: 30px;
+  background-color: #808080;
+  border-radius: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: left 0.3s;
+}
+
+.success {
+  color: green;
+}
+
+.failure {
+  color: red;
+}
+
+.toggle.success .slider {
+  left: 0;
+}
+
+.toggle.failure .slider {
+  left: 50%;
+}
+
+.slider:before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #000; /* Grey color for default handle */
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 5px; /* Adjust the position as needed */
+  transition: background-color 0.3s;
+}
+
+.toggle.success .slider:before {
+  background-color: green;
+}
+
+.toggle.failure .slider:before {
+  background-color: red;
+}
+
+/* JobList.css */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center; /* Align table data in the center */
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2; /* Use alternate colors for rows */
+}
+
+tr:hover {
+  background-color: #ddd; /* Change background color on hover */
+}

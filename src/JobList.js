@@ -7,6 +7,7 @@ const JobList = () => {
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [listCount, setListCount] = useState(0)
+  const [sortOrder, setSortOrder] = useState('desc');
 
   useEffect(() => {
     // Fetch data from API on component mount
@@ -114,6 +115,16 @@ const handleToggle = async (jobName, buildNumber, currentStatus, time) => {
   }
 };
 
+const handleSort = () => {
+  const sortedJobs = [...jobs].sort((a, b) => {
+    const timeA = new Date(a.time).getTime();
+    const timeB = new Date(b.time).getTime();
+    return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+  });
+    setJobs(sortedJobs);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+};
+
 
   const handleJobNameChange = (event) => {
     setSelectedJobName(event.target.value);
@@ -160,7 +171,7 @@ const handleToggle = async (jobName, buildNumber, currentStatus, time) => {
             <tr>
               <th>Job Name</th>
               <th>Build Number</th>
-              <th>Time</th>
+              <th onClick={handleSort} style={{ cursor: 'pointer' }}>Time {sortOrder === 'asc' ? '↑' : '↓'}</th>
               <th>Status</th>
             </tr>
           </thead>

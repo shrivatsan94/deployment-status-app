@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import './JobList.css'; // Import CSS file for styling
 
 const JobList = () => {
@@ -6,19 +9,46 @@ const JobList = () => {
   const [selectedJobName, setSelectedJobName] = useState('all');
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [listCount, setListCount] = useState(0)
+  const [listCount, setListCount] = useState(0);
   const [sortOrder, setSortOrder] = useState('desc');
+  //const [selectedDate, setSelectedDate] = useState(new Date()); // Default selected date is today
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+    useEffect(() => {
+      // Set default dates as one week from now
+      const defaultStartDate = new Date();
+      defaultStartDate.setDate(defaultStartDate.getDate() - 7);
+      setStartDate(defaultStartDate);
+      setEndDate(new Date());
+    }, []);
+
+      const handleStartDateChange = date => {
+        setStartDate(date);
+        if (startDate && date > endDate) {
+          // If start date is later than end date, reset end date
+          setEndDate(null);
+        }
+      };
+
+      //const handleEndDateChange = date => {
+      //  setEndDate(date);
+      //  if (startDate && date < startDate) {
+      //    // If end date is earlier than start date, reset start date
+      //    setStartDate(null);
+      //  }
+      //};
 
   useEffect(() => {
-    // Fetch data from API on component mount
     fetchData();
-  }, []);
+  }, [startDate, endDate]);// Refetch data when selectedDate changes
 
   const fetchData = async () => {
     try {
-      let endpoint = "https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/get-jobdetails"
+      // Calculate date range for the past 7 days
 
-      endpoint += `?jobName=${selectedJobName}`;
+      let endpoint = "https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/get-jobDetailsTimeBased"
+      endpoint += `?jobName=${selectedJobName}&jobStatus=${selectedStatus}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
 
       const response = await fetch(endpoint);
       const data = await response.json();
@@ -41,9 +71,9 @@ const JobList = () => {
 
   const fetchDataJobName = async (jobname) => {
     try {
-      let endpoint = "https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/get-jobdetails"
+      let endpoint = "https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/get-jobDetailsTimeBased"
 
-      endpoint += `?jobName=${jobname}&jobStatus=${selectedStatus}`;
+      endpoint += `?jobName=${jobname}&jobStatus=${selectedStatus}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
 
       const response = await fetch(endpoint);
       const data = await response.json();
@@ -65,9 +95,9 @@ const JobList = () => {
 
     const fetchDataJobStatus= async (jobstatus) => {
       try {
-        let endpoint = "https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/get-jobdetails"
+        let endpoint = "https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/get-jobDetailsTimeBased"
 
-        endpoint += `?jobName=${selectedJobName}&jobStatus=${jobstatus}`;
+        endpoint += `?jobName=${selectedJobName}&jobStatus=${jobstatus}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
 
         const response = await fetch(endpoint);
         const data = await response.json();
@@ -87,48 +117,46 @@ const JobList = () => {
       }
     };
 
-const handleToggle = async (jobName, buildNumber, currentStatus, time) => {
-  const newStatus = currentStatus === 'success' ? 'failure' : 'success';
+  const handleToggle = async (jobName, buildNumber, currentStatus, time) => {
+    const newStatus = currentStatus === 'success' ? 'failure' : 'success';
 
-  // Update status locally
-  const updatedJobs = jobs.map(job => {
-    if (job.buildNumber === buildNumber) {
-      job.status = newStatus;
-    }
-    return job;
-  });
-  setJobs(updatedJobs);
-
-  // Send updated status to API
-  try {
-    const response = await fetch('https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/update-jobdetails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': '7P7ntMrQ0V1kCVOBOtZpiam9JbViedtq2mJSMIkv'
-      },
-      body: JSON.stringify({ jobName, buildNumber, status: newStatus, time: time})
+    // Update status locally
+    const updatedJobs = jobs.map(job => {
+      if (job.buildNumber === buildNumber) {
+        job.status = newStatus;
+      }
+      return job;
     });
-    // Handle response if needed
-  } catch (error) {
-    console.error('Error updating status:', error);
-  }
-};
+    setJobs(updatedJobs);
 
-const handleSort = () => {
-  const sortedJobs = [...jobs].sort((a, b) => {
-    const timeA = new Date(a.time).getTime();
-    const timeB = new Date(b.time).getTime();
-    return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
-  });
+    // Send updated status to API
+    try {
+      const response = await fetch('https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/update-jobdetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': '7P7ntMrQ0V1kCVOBOtZpiam9JbViedtq2mJSMIkv'
+        },
+        body: JSON.stringify({ jobName, buildNumber, status: newStatus, time: time})
+      });
+      // Handle response if needed
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  const handleSort = () => {
+    const sortedJobs = [...jobs].sort((a, b) => {
+      const timeA = new Date(a.time).getTime();
+      const timeB = new Date(b.time).getTime();
+      return sortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+    });
     setJobs(sortedJobs);
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-};
-
+  };
 
   const handleJobNameChange = (event) => {
     setSelectedJobName(event.target.value);
-    console.log(event.target.value);
     setLoading(true);
     fetchDataJobName(event.target.value);
   };
@@ -139,11 +167,13 @@ const handleSort = () => {
     fetchDataJobStatus(event.target.value);
   };
 
+
+
   return (
     <div>
       <h2>Job List</h2>
       <p>
-      <h3> count: {listCount} </h3>
+        <h3> count: {listCount} </h3>
       </p>
       <div>
         <p>
@@ -155,12 +185,32 @@ const handleSort = () => {
             ))}
           </select>
           &nbsp; &nbsp; &nbsp; &nbsp;
-           <label htmlFor="status">Filter by Status:</label>
-           <select id="status" value={selectedStatus} onChange={handleStatusChange}>
-             <option value="all">All</option>
-             <option value="success">Success</option>
-             <option value="failure">Failure</option>
-           </select>
+          <label htmlFor="status">Filter by Status:</label>
+          <select id="status" value={selectedStatus} onChange={handleStatusChange}>
+            <option value="all">All</option>
+            <option value="success">Success</option>
+            <option value="failure">Failure</option>
+          </select>
+          &nbsp; &nbsp; &nbsp; &nbsp;
+          <label htmlFor="datePicker">Select Date:</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => handleStartDateChange(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              placeholderText="Start Date"
+            />
+            <span style={{ margin: '0 10px' }}></span> {/* Spacer */}
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              placeholderText="End Date"
+            />
         </p>
       </div>
       {loading ? (
@@ -182,12 +232,11 @@ const handleSort = () => {
                 <td>{job.buildNumber}</td>
                 <td>{job.time}</td>
                 <td>
-
-                    <div className={`toggle ${job.status}`} onClick={() => handleToggle(job.jobName, job.buildNumber, job.status, job.time)}>
-                      <div className="failure">Failure</div>
-                      <div className="success">Success</div>
-                      <div className="slider"></div>
-                    </div>
+                  <div className={`toggle ${job.status}`} onClick={() => handleToggle(job.jobName, job.buildNumber, job.status, job.time)}>
+                    <div className="failure">Failure</div>
+                    <div className="success">Success</div>
+                    <div className="slider"></div>
+                  </div>
                 </td>
               </tr>
             ))}

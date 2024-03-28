@@ -167,6 +167,31 @@ const JobList = () => {
     fetchDataJobStatus(event.target.value);
   };
 
+  const handleUpdateFailureReason = async (job) => {
+    try {
+      const response = await fetch('https://1ysnzjg1h6.execute-api.eu-central-1.amazonaws.com/prod/update-jobdetails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': '7P7ntMrQ0V1kCVOBOtZpiam9JbViedtq2mJSMIkv'
+        },
+        body: JSON.stringify({ jobName: job.jobName, buildNumber: job.buildNumber, status: job.status, failureReason: job.failureReason, time: job.time})
+      });
+      // Handle response if needed
+    } catch (error) {
+      console.error('Error updating failure reason:', error);
+    }
+  };
+
+  const handleFailureReasonChange = (event, job) => {
+    const updatedJobs = jobs.map(j => {
+      if (j.buildNumber === job.buildNumber) {
+        return { ...j, failureReason: event.target.value };
+      }
+      return j;
+    });
+    setJobs(updatedJobs);
+  };
 
 
   return (
@@ -223,6 +248,7 @@ const JobList = () => {
               <th>Build Number</th>
               <th onClick={handleSort} style={{ cursor: 'pointer' }}>Time {sortOrder === 'asc' ? '↑' : '↓'}</th>
               <th>Status</th>
+              <th>Failure description if any</th>
             </tr>
           </thead>
           <tbody>
@@ -237,6 +263,22 @@ const JobList = () => {
                     <div className="success">Success</div>
                     <div className="slider"></div>
                   </div>
+                </td>
+                <td>
+                  {job.status === 'failure' ? (
+                       <textarea
+                         value={job.failureReason || ''}
+                         onChange={(event) => handleFailureReasonChange(event, job)}
+                         rows={8} // Set the number of visible text lines
+                         cols={100} // Set the number of visible text columns
+                         style={{ resize: 'vertical' }} // Allow vertical resizing
+                       />
+                     ) : null}
+                </td>
+                <td>
+                  {job.status === 'failure' ? (
+                    <button onClick={() => handleUpdateFailureReason(job)}>Update</button>
+                  ) : null}
                 </td>
               </tr>
             ))}
